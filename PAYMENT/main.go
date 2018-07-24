@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func readCompanies(name string) [][]string {
+
 
 func readValutes(name string) [][]string {
 	file, err := os.Open(name)
@@ -33,7 +33,7 @@ func checkValute(valute string, rowsV [][]string) (string, error) {
 		if i == 0 {
 			continue
 		}
-		if strings.EqualFold(rowsV[i][1], valute) {
+		if strings.EqualFold(rowsV[i][0], valute) {
 			return rowsV[i][1], nil
 		}
 

@@ -7,9 +7,9 @@ import (
 )
 
 func CalculatingPerCompani() map[string]string {
-	rows := readingCSV.ReadValutes("../asd/Valutes.csv")
+	rows := readingCSV.ReadValutes("asd/Valutes.csv")
 	valutes := readingCSV.CurrenciesConverter(rows)
-	rowsV := readingCSV.ReadValutes("../asd/Companies.csv")
+	rowsV := readingCSV.ReadValutes("asd/Companies.csv")
 	companies := readingCSV.CurrenciesPerCompanyConverter(rowsV)
 	ret := make(map[string]string)
 	for i := 0; i < len(companies); i++ {

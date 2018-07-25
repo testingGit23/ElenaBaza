@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	writingTotals.WriteCSV("Companies.csv", calculate.CalculatingPerCompani())
-	matrix := readingCSV.ReadValutes("Companies.csv")
+	writingTotals.WriteCSV("asd/Companies.csv", calculate.CalculatingPerCompani())
+	matrix := readingCSV.ReadValutes("asd/Companies.csv")
 	total := 0.0
 	for i, row := range matrix {
 		if i == 0 {

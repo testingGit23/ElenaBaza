@@ -31,7 +31,7 @@ func WriteCSV(name string, totalsPerCompany map[string]string) {
 		log.Fatalf("can't read CSV data", err.Error())
 	}
 	new := changingRow(red, totalsPerCompany)
-	write("New.csv", new)
+	write("Companies.csv", new)
 }
 
 func changingRow(matrica [][]string, totalsPerCompany map[string]string) [][]string {

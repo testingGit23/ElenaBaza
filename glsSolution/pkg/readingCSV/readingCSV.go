@@ -2,11 +2,9 @@ package readingCSV
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
-	"strings"
 )
 
 func ReadValutes(name string) [][]string {
@@ -61,27 +59,25 @@ func CurrenciesPerCompanyConverter(matrica [][]string) []CurrenciesPerCompany {
 		}
 		var name string
 		var values []Currencies
-		var value float64
-		niza := fmt.Sprintln(row)
-		rows := strings.Split(niza, ";")
-		for j, elem := range rows {
-			fmt.Println(elem)
+
+		var v Currencies
+
+		for j, elem := range row {
+			//fmt.Println(elem)
 			if j == 0 {
-				name = string(elem[j])
+				name = elem
 				continue
-			}
-			if j%2 != 0 {
-				val, err := strconv.ParseFloat(string(elem[j]), 64)
+			} else if j%2 == 0 {
+				val, err := strconv.ParseFloat(elem, 64)
 				if err != nil {
 					log.Fatalf("can't parse", err.Error())
 				}
-				value = val
+				v.InDenars = val
+				values = append(values, v)
+			} else {
+				v.Currency = elem
 			}
-			v := Currencies{
-				Currency: string(elem[j]),
-				InDenars: value,
-			}
-			values = append(values, v)
+
 		}
 		ret[i-1] = CurrenciesPerCompany{
 			CompanyName:              name,

@@ -8,8 +8,13 @@ import (
 func main() {
 	rows := readingCSV.ReadValutes("Valutes.csv")
 	valutes := readingCSV.CurrenciesConverter(rows)
-	fmt.Println(valutes)
+	for index := 0; index < len(valutes); index++ {
+		fmt.Println(valutes[index])
+	}
+
 	rowsV := readingCSV.ReadValutes("Companies.csv")
 	companies := readingCSV.CurrenciesPerCompanyConverter(rowsV)
-	fmt.Println(companies)
+	for index := 0; index < len(companies); index++ {
+		fmt.Println(companies[index])
+	}
 }

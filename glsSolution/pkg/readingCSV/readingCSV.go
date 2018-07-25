@@ -15,7 +15,7 @@ func ReadValutes(name string) [][]string {
 	defer file.Close()
 
 	r := csv.NewReader(file)
-	r.Comma = ';'
+	//r.Comma = ','
 	rowsV, err := r.ReadAll()
 	if err != nil {
 		log.Fatalf("can't read CSV data", err.Error())

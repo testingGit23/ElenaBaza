@@ -1,0 +1,6 @@
+<h1>Viewing {{.Title}}</h1>
+
+<form action="/edit/{{.Title}}" method="POST">
+    <div><input type="submit" value="Edit"></div><br>
+    <div><label name="body" rows="15" cols="50">{{printf "%s" .Body}}</label></div>
+</form>

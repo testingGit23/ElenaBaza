@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func ReadValutes(name string) [][]string {
+func ReadCsv(name string) [][]string {
 	file, err := os.Open(name)
 	if err != nil {
 		log.Fatalf("can't open %s file", name, err.Error())
@@ -23,9 +23,10 @@ func ReadValutes(name string) [][]string {
 	return rowsV
 }
 
-func CurrenciesConverter(matrica [][]string) []Currencies {
-	ret := make([]Currencies, len(matrica)-1)
-	for i, elem := range matrica {
+func CurrenciesReader(name string) []Currencies {
+	rows := ReadCsv(name)
+	ret := make([]Currencies, len(rows)-1)
+	for i, elem := range rows {
 		if i == 0 {
 			continue
 		}
@@ -35,7 +36,7 @@ func CurrenciesConverter(matrica [][]string) []Currencies {
 		}
 		ret[i-1] = Currencies{
 			Currency: elem[0],
-			InDenars: val,
+			Amount:   val,
 		}
 	}
 	return ret
@@ -43,7 +44,7 @@ func CurrenciesConverter(matrica [][]string) []Currencies {
 
 type Currencies struct {
 	Currency string
-	InDenars float64
+	Amount   float64
 }
 
 type CurrenciesPerCompany struct {
@@ -51,9 +52,10 @@ type CurrenciesPerCompany struct {
 	CurrenciesForThisCompany []Currencies
 }
 
-func CurrenciesPerCompanyConverter(matrica [][]string) []CurrenciesPerCompany {
-	ret := make([]CurrenciesPerCompany, len(matrica)-1)
-	for i, row := range matrica {
+func CurrenciesPerCompanyReader(name string) []CurrenciesPerCompany {
+	rows := ReadCsv(name)
+	ret := make([]CurrenciesPerCompany, len(rows)-1)
+	for i, row := range rows {
 		if i == 0 {
 			continue
 		}
@@ -72,7 +74,7 @@ func CurrenciesPerCompanyConverter(matrica [][]string) []CurrenciesPerCompany {
 				if err != nil {
 					log.Fatalf("can't parse", err.Error())
 				}
-				v.InDenars = val
+				v.Amount = val
 				values = append(values, v)
 			} else {
 				v.Currency = elem

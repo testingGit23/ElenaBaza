@@ -2,8 +2,10 @@ package writingTotals
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -24,19 +26,25 @@ func WriteCSV(name string, totalsPerCompany map[string]string) {
 	defer file.Close()
 
 	r := csv.NewReader(file)
-	//r.Comma = ','
-	rowsV, err := r.ReadAll()
-	red := rowsV
+	rows, err := r.ReadAll()
 	if err != nil {
 		log.Fatalf("can't read CSV data", err.Error())
 	}
-	new := changingRow(red, totalsPerCompany)
-	write("asd/Companies.csv", new)
+	newRows, total := changingRows(rows, totalsPerCompany)
+	write("asd/Companies.csv", newRows)
+	fmt.Println("TOTAL:   ", total)
 }
 
-func changingRow(matrica [][]string, totalsPerCompany map[string]string) [][]string {
-	var ret [][]string
-	ret = matrica
+func changingRows(rows [][]string, totalsPerCompany map[string]string) ([][]string, float64) {
+
+	lenth := len(rows[0])
+	ret := rows
+	if rows[0][lenth-1] == "Total" {
+		for i, row := range rows {
+			ret[i] = row[:lenth-1]
+		}
+	}
+	total := 0.0
 	for i := 0; i < len(ret); i++ {
 		if i == 0 {
 			ret[0] = append(ret[0], "Total")
@@ -44,9 +52,12 @@ func changingRow(matrica [][]string, totalsPerCompany map[string]string) [][]str
 			for k, v := range totalsPerCompany {
 				if strings.EqualFold(ret[i][0], k) {
 					ret[i] = append(ret[i], v)
+					val, _ := strconv.ParseFloat(v, 64)
+					total += val
 				}
 			}
 		}
 	}
-	return ret
+
+	return ret, total
 }

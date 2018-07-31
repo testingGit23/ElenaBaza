@@ -1,0 +1,27 @@
+{{ define "Valutes" }}
+        {{ template "Header" }}
+{{ template "Menu" }}
+
+
+<h2> Valutes </h2>
+<table border="1">
+<thead>
+<tr>
+    <td>Currency</td>
+    <td>inDenars</td>
+
+</tr>
+</thead>
+<tbody>
+{{ range . }}
+<tr>
+    <td>{{ .Currency }}</td>
+    <td> {{ .InDenars}} </td>
+
+
+</tr>
+{{ end }}
+</tbody>
+</table>
+        {{ template "Footer" }}
+        {{ end }}

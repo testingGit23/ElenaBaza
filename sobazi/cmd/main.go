@@ -44,7 +44,9 @@ func Valutes(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err)
 		}
+
 		allValutes = append(allValutes, c)
+
 	}
 	// fmt.Fprintln(w, allValutes)
 
@@ -161,6 +163,6 @@ func main() {
 	//fmt.Println(merchantsUsernames)
 	//fmt.Println(totalsMap)
 	log.Println("Server started on: http://localhost:3606")
-	http.HandleFunc("/", Valutes)
+	http.HandleFunc("/valutes", Valutes)
 	http.ListenAndServe(":3606", nil)
 }

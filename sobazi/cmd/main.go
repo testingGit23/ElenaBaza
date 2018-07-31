@@ -2,29 +2,54 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
+	"net/http"
+	"html/template"
 )
 
-const (
-	//host     = "localhost"
-	//port     = "3306"
-	user     = "root"
-	password = "12345"
-	dbName   = "demodb"
-)
+
 
 func selectDatabase() (db *sql.DB) {
-	db, err := sql.Open("mysql",
-		user+":"+password+"@/"+dbName)
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbPass := "darko123"
+	dbName := "goblog"
+
+	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
 	if err != nil {
-		log.Fatal(err)
+		panic(err.Error())
 	}
-	//fmt.Println(db)
-	//defer db.Close()
 	return db
+
+}
+type Currencies struct {
+	Currency string
+	InDenars float64
+}
+var tmpl = template.Must(template.ParseGlob("form/*"))
+
+func Valutes(w http.ResponseWriter, r *http.Request) {
+	db := selectDatabase()
+	rows, err := db.Query("SELECT * FROM currencies")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	var allValutes []Currencies
+	for rows.Next() {
+		var c Currencies
+		err = rows.Scan(&c.Currency, &c.InDenars)
+		if err != nil {
+			panic(err)
+		}
+		allValutes = append(allValutes, c)
+	}
+	// fmt.Fprintln(w, allValutes)
+
+	tmpl.ExecuteTemplate(w, "Valutes", allValutes)
+
 }
 
 func selectAllCurrencies(db *sql.DB) ([]string, error) {
@@ -122,16 +147,20 @@ func totals(valutes []string, merchants []string, db *sql.DB) (map[string]float6
 	return ret, nil
 }
 
+
+
 func main() {
-	dataBase := selectDatabase()
-	currencies, _ := selectAllCurrencies(dataBase)
+//	dataBase := selectDatabase()
+	//currencies, _ := selectAllCurrencies(dataBase)
 
-	merchantsUsernames, _ := selectAllMerchants(dataBase)
+	//merchantsUsernames, _ := selectAllMerchants(dataBase)
 
-	totalsMap, _ := totals(currencies, merchantsUsernames, dataBase)
+	//totalsMap, _ := totals(currencies, merchantsUsernames, dataBase)
 
-	fmt.Println(currencies)
-	fmt.Println(merchantsUsernames)
-	fmt.Println(totalsMap)
-	//fmt.Println(53624.3 * 53.65)
+	//fmt.Println(currencies)
+	//fmt.Println(merchantsUsernames)
+	//fmt.Println(totalsMap)
+	log.Println("Server started on: http://localhost:3606")
+	http.HandleFunc("/", Valutes)
+	http.ListenAndServe(":3606", nil)
 }

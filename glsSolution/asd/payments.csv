@@ -1,0 +1,11 @@
+paymentID,merchantUsername,currency,amount,dateOfPayment
+1,Djale,EUR,635.254,2015-06-06
+2,Djale,USD,635.254,2015-06-06
+3,Djale,GBP,635.254,2015-06-06
+4,Gligor,GBP,65864.4,2018-07-31
+5,Gligor,GBP,65864.4,2018-07-31
+6,Gligor,eur,13864.3,2018-07-31
+7,dino,usd,6350.35,2018-07-31
+8,dino,sek,5456.35,2018-07-31
+9,dino,chf,63.35,2018-07-31
+10,gligor,chf,36545.4,2018-07-31

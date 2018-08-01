@@ -25,6 +25,7 @@ type Payment struct {
 	Currency string
 	Amount   float64
 	Date     string
+	Total    float64
 }
 
 func selectDatabase() (db *sql.DB) {
@@ -78,23 +79,54 @@ func view(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 	}
+
+	valutes, _ := selectAllCurrencies(db)
+
+	for _, inDenars := range valutes {
+		var sumFromQuerry float64
+		var pom float64
+		var temp float64
+		err := db.QueryRow("SELECT SUM(amount) FROM payments WHERE merchantUsername=(?) AND currency=(?)", p.Merchant, inDenars).Scan(&temp)
+		if err != nil {
+			temp = 0
+		}
+		sumFromQuerry = temp
+
+		var InDenars float64
+		currencyInDenars, err := db.Query("SELECT inDenars FROM currencies WHERE currency=(?)", inDenars)
+		if err != nil {
+			panic(err)
+		}
+
+		for currencyInDenars.Next() {
+			//var temp float64
+			err = currencyInDenars.Scan(&temp)
+			if err != nil {
+				panic(err)
+			}
+			InDenars = temp
+		}
+		err = currencyInDenars.Err()
+		if err != nil {
+			panic(err)
+		}
+		defer currencyInDenars.Close()
+		pom = sumFromQuerry * InDenars
+		p.Total = p.Total + pom
+
+	}
+	//fmt.Println(total)
+
 	tmpl.ExecuteTemplate(w, "Show", p)
 }
 
 func edit(w http.ResponseWriter, r *http.Request) {
 	db := selectDatabase()
 	id := r.URL.Query().Get("id")
-	rows, err := db.Query("SELECT * FROM payments WHERE paymentID=(?)", id)
+	var p Payment
+	err := db.QueryRow("SELECT * FROM payments WHERE paymentID=(?)", id).Scan(&p.ID, &p.Merchant, &p.Currency, &p.Amount, &p.Date)
 	if err != nil {
 		panic(err)
-	}
-	defer db.Close()
-	var p Payment
-	for rows.Next() {
-		err = rows.Scan(&p.ID, &p.Merchant, &p.Currency, &p.Amount, &p.Date)
-		if err != nil {
-			panic(err)
-		}
 	}
 	tmpl.ExecuteTemplate(w, "Edit", p)
 }
@@ -147,6 +179,28 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	log.Println("DELETE")
 	defer db.Close()
 	http.Redirect(w, r, "/", 301)
+}
+
+func selectAllCurrencies(db *sql.DB) ([]string, error) {
+	rows, err := db.Query("SELECT currency FROM currencies")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var ret []string
+	for rows.Next() {
+		var temp string
+		err = rows.Scan(&temp)
+		if err != nil {
+			return nil, err
+		}
+		ret = append(ret, temp)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
 }
 
 func main() {

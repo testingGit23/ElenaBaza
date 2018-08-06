@@ -39,25 +39,24 @@ func selectDatabase() (db *sql.DB) {
 	return db
 }
 
-func home(w http.ResponseWriter, r *http.Request) {
-	db := selectDatabase()
-	rows, err := db.Query("SELECT * FROM payments")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	var allPayments []Payment
-	for rows.Next() {
-		var p Payment
-		err = rows.Scan(&p.ID, &p.Merchant, &p.Currency, &p.Amount, &p.Date)
+func home(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rows, err := db.Query("SELECT * FROM payments")
 		if err != nil {
 			panic(err)
 		}
-		allPayments = append(allPayments, p)
+		var allPayments []Payment
+		for rows.Next() {
+			var p Payment
+			err = rows.Scan(&p.ID, &p.Merchant, &p.Currency, &p.Amount, &p.Date)
+			if err != nil {
+				panic(err)
+			}
+			allPayments = append(allPayments, p)
+		}
+		//fmt.Fprintln(w, allPayments)
+		tmpl.ExecuteTemplate(w, "Home", allPayments)
 	}
-	//fmt.Fprintln(w, allPayments)
-	tmpl.ExecuteTemplate(w, "Home", allPayments)
-
 }
 
 func new(w http.ResponseWriter, r *http.Request) {
@@ -69,9 +68,8 @@ func view(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	rows, err := db.Query("SELECT * FROM payments WHERE paymentID=(?)", id)
 	if err != nil {
-		panic(err)
+		return
 	}
-	defer db.Close()
 	var p Payment
 	for rows.Next() {
 		err = rows.Scan(&p.ID, &p.Merchant, &p.Currency, &p.Amount, &p.Date)
@@ -204,7 +202,10 @@ func selectAllCurrencies(db *sql.DB) ([]string, error) {
 }
 
 func main() {
-	http.HandleFunc("/", home)
+	db := selectDatabase()
+	defer db.Close()
+
+	http.HandleFunc("/", home(db))
 	http.HandleFunc("/new", new)
 	http.HandleFunc("/view", view)
 	http.HandleFunc("/edit", edit)
